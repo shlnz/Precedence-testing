@@ -1,0 +1,33 @@
+use std::str::FromStr;
+
+grammar;
+
+pub StartRule = Expr;
+
+Expr = <ExprNot>;
+
+ExprNot: i64 = {
+    "Not" <r: ExprNot> => !r,
+    ExprPlus,
+}
+
+ExprPlus: i64 = {
+    <l: ExprPlus> "+" <r: ExprMult> => l + r,
+    <l: ExprPlus> "-" <r: ExprMult> => l - r,
+    ExprMult,
+}
+
+ExprMult: i64 = {
+    <l: ExprMult> "*" <r: LiteralExpr> => l * r,
+    <l: ExprMult> "/" <r: LiteralExpr> => l / r,
+    LiteralExpr,
+}
+
+LiteralExpr = {
+    <Integer>,
+    "(" <Expr> ")",
+}
+
+Integer: i64 = {
+    <r"[0-9]+"> => i64::from_str(<>).unwrap(),
+}
